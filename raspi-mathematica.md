@@ -1,0 +1,6 @@
+﻿
+~~~
+$Version
+Print[$Version]
+Quit[]
+~~~
