@@ -22,13 +22,9 @@ assign
 
 Put contents of the unzipped NOOBS archive on the card.
 
-### get this doc
+### view this doc
 
-```
-cd
-git clone https://github.com/ziembla/raspi-fun.git
-```
-
+<https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md>
 
 ## Basic configuration
 
@@ -53,7 +49,7 @@ sudo raspi-config
     * "Boot options"/"Console"
     * "Internationalisation Options"
         * "Change locale"
-            * clean existing "en_GB..." or "en_US..." using **Space**
+            * clean existing "en_GB.UTF-8" or "en_US..." using **Space**
             * check "pl_PL.UTF-8"
         * "Change timezone"/"Europe"/"Warsaw"
         * "Change keyboard layout"/"104-key"/"Polish"/"default"/"no compose"/"no"
@@ -69,7 +65,8 @@ sudo raspi-config
 sudo dpkg-reconfigure console-setup
 ~~~
     * "UTF-8"/"Latin2"/"Terminus" (or "Fixed")/"8x16" (or "8x14")
-* to change font in terminal window (LXTerminal) just use "Edycja"/"Preferencje" to change "Monospace 10"->"DejaVu Sans Mono 9"
+
+### nonstandard user setup
 
 * in terminal
 ~~~
@@ -81,8 +78,9 @@ usermod -L pi
 cat grep pi /etc/shadow 
 ~~~
 verify, that the `pi` user has `!` in front of the password hash to be locked from logging in  
-(unlock with `usermod -U pi` when needed) 
 
+    * unlock later with `usermod -U pi` when needed
+    * remember, that `su pi` from `root`'s terminal is still possible (no password needed)
 
 * append the following to `.bashrc` files in both `/home/XXXXX` and `/root` directories 
 ~~~
@@ -99,20 +97,53 @@ add line based of the `pi` user
 XXXXX ALL=(ALL) NOPASSWD: ALL
 ~~~
 
-### nonstandard user setup
+* to change font in terminal window (LXTerminal) just use "Edycja"/"Preferencje" to change "Monospace 10"->"DejaVu Sans Mono 9"
+
+
+### clone this doc
+
+```
+cd
+git clone https://github.com/ziembla/raspi-fun.git
+```
+
 
 ### wifi
 
-* disable history...
+disable history, use PSK to avoid keeping plaintext password in config (is it really such a great idea?!)
 ~~~
-export HISTFILE=
+unset HISTFILE
 wpa_passphrase SSID PASSWORD
 vi /etc/wpa_supplicant/wpa_supplicant.conf
 ~~~
 
+copy output, skipping password, add `scan_ssid=1` if the network is hidden
+
+### wifi TL-WN725N
+
+<http://botland.com.pl/content/70-konfiguracja-wifi>
+<https://github.com/lwfinger/rtl8188eu/>
+
+```
+sudo wget https://github.com/lwfinger/rtl8188eu/raw/c83976d1dfb4793893158461430261562b3a5bf0/rtl8188eufw.bin -O /lib/firmware/rtlwifi/rtl8188eufw.bin
+```
+or
+```
+sudo install -p -m 644 8188eu.ko /lib/modules/`uname -r`/kernel/drivers/net/wireless 
+sudo depmod -a
+sudo modprobe 8188eu
+```
+
+`TL-WN725N/install.sh`
+
 ### packages
 
-
+```
+sudo apt-get install \
+    okular \
+    iceweasel \
+ 
+```
 
 ## Operations
 
@@ -122,6 +153,18 @@ su -          # same as 'su -l root'
 su - user     # same as 'su -l user'
 ~~~
 
+other admin stuff
+```
+lsmod
+lsusb
+
+visudo     # edit /etc/sudoers
+vipw [-s]  # edit /etc/passwd (/etc/shadow)
+vigr [-s]  # edit /etc/group (/etc/gshadow)
+
+usermod -L pi
+usermod -U pi
+```
 
 ### version checks
 
@@ -142,8 +185,6 @@ wolfram -run 'Print[$Version]; Quit[]'
 /opt/vc/bin/vcgencmd version
 ~~~
 
-
-
 ### screenshots
 ~~~
 scrot -cd 5 -a PLIK.png
@@ -153,28 +194,19 @@ scrot -s
 `-u` active window  
 `-s` selected area
 
-
-
-
-
 ### monitoring
 ~~~
 dmesg -H
 htop
 ~~~
 
-
-
-
 ~~~
-visudo     # edit /etc/sudoers
-vipw [-s]  # edit /etc/passwd (/etc/shadow)
-vigr [-s]  # edit /etc/group (/etc/gshadow)
-
-usermod -L pi
-usermod -U pi
-
 ifconfig
 ifconfig wlan0 down
 ifconfig wlan0 up
 ~~~
+
+### other
+```
+wget -O XXXXX https://xxxxx
+```
