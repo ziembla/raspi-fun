@@ -1,10 +1,33 @@
 ﻿
-Setting up a new Raspberry Pi
+# Setting up a new Raspberry Pi #
 
-## access to this doc
+## Installing NOOBS
 
+Raspbian's changelog is in `os/Raspbian/release_notes.txt` in the `NOOBS-*.zip`
+
+### cleaning flash card
+
+**VERIFY THAT YOU KNOW WHAT YOU'RE DOING BEFORE RUNNING COMMANDS GIVEN BELOW. THESE CAN DESTROY YOUR SYSTEM, NOT ONLY THE CARD!**
+
+In Windows, run `cmd.exe` as Administrator, then `diskpart`: 
+
+```
+list disk
+select disk XXX
+clean
+create partition primary
+format fs=fat32 quick
+assign
+```
+
+Put contents of the unzipped NOOBS archive on the card.
+
+### get this doc
+
+```
 cd
-git clone https://github.com/XXXXX/raspi-fun.git
+git clone https://github.com/ziembla/raspi-fun.git
+```
 
 
 ## Basic configuration
