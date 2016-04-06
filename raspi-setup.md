@@ -29,7 +29,7 @@ Put contents of the unzipped NOOBS archive on the card.
 or clone it
 ```
 cd
-git clone https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md
+git clone https://github.com/ziembla/raspi-fun.git
 git config --global user.name XXXXX
 git config --global user.email XXXXX
 ```
