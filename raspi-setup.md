@@ -3,7 +3,7 @@
 
 ## Installing NOOBS
 
-Raspbian's changelog is in `os/Raspbian/release_notes.txt` in the `NOOBS-*.zip`
+Note: Raspbian's changelog is in `os/Raspbian/release_notes.txt` in the `NOOBS-*.zip`
 
 ### cleaning flash card
 
@@ -25,6 +25,14 @@ Put contents of the unzipped NOOBS archive on the card.
 ### view this doc
 
 <https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md>
+
+or clone it
+```
+cd
+git clone https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md
+git config --global user.name XXXXX
+git config --global user.email XXXXX
+```
 
 ## Basic configuration
 
@@ -54,10 +62,11 @@ sudo raspi-config
         * "Change timezone"/"Europe"/"Warsaw"
         * "Change keyboard layout"/"104-key"/"Polish"/"default"/"no compose"/"no"
     * "Advanced options"
-        * "Hostname" (raspberrypi->*raspi-tata*)
+        * "Hostname" (raspberrypi->XXXXX)
         * "Memory Split" 256
-        * (leave SSH access enabled????)
+        * (leave SSH access enabled?!)
         * "Audio"/"Force 3.5mm jack"
+        * "GL Driver"/"Enable" (required by colobot only?!)
     * "Finish" (**Tab** to exit menu)
     * reboot
 * in terminal
@@ -139,11 +148,48 @@ sudo modprobe 8188eu
 ### packages
 
 ```
+sudo apt-get update
+sudo apt-get upgrade
 sudo apt-get install \
+    kate \
+    vlc \
     okular \
     iceweasel \
+
+    python-nltk \
+
+    python-reportlab \
+
+    colobot \
+
  
 ```
+
+Warnings
+- **colobot** is a superb programming game, still at least the linux '0.1.3-alpha' version tends to hang my raspberry 2 (NOOBS+Raspbian 1.9.0). I have no idea whether it is the game's or experimental OpenGL's (see `raspi-config` above) fault...
+- don't try to install "all" in `sudo python -c "import nltk; nltk.download()"` (too big)
+
+
+## Scratch
+
+<http://download.scratch.mit.edu/ScratchReferenceGuide14.pdf>
+
+
+## Backup
+
+colobot
+```
+cd
+tar -czvf backup-colobot-$(date '+%Y%m%d-%H%M%S').tgz .config/colobot.ini .local/share/colobot/*
+```
+
+restore
+```
+cd
+tar -xzvf backup-XXXXX.tgz
+```
+
+
 
 ## Operations
 
@@ -194,6 +240,29 @@ scrot -s
 `-u` active window  
 `-s` selected area
 
+### ssh
+listing server public keys
+~~~
+for file in /etc/ssh/*_key.pub do ; echo $file ; ssh-keygen -lf $file ; echo ; done
+~~~
+connecting to server
+~~~
+ssh USER@HOST
+~~~
+
+### packages
+
+```
+dpkg-query -L <package> # list files coming with <package>
+```
+
+### finding
+
+files under home, matching pattern, changed last 24h
+```
+find ~ -type f -regex '.*pattern.*' -mtime -1 -ls
+```
+
 ### monitoring
 ~~~
 dmesg -H
@@ -202,11 +271,16 @@ htop
 
 ~~~
 ifconfig
+ifconfig wlan0 
 ifconfig wlan0 down
-ifconfig wlan0 up
+ifdown wlan0
+ifup wlan0
 ~~~
 
 ### other
 ```
 wget -O XXXXX https://xxxxx
+hexdump -Cn 512 XXXXX
 ```
+
+- after X-window hang: keep `<Alt>+<PrtScr>` pressed and type (slowly, wait for any response after each key): `reisub`
