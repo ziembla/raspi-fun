@@ -1,6 +1,0 @@
-﻿
-~~~
-$Version
-Print[$Version]
-Quit[]
-~~~
