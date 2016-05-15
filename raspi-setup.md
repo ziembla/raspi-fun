@@ -1,4 +1,4 @@
-﻿
+
 # Setting up a new Raspberry Pi #
 
 ## Installing NOOBS
@@ -9,7 +9,7 @@ Note: Raspbian's changelog is in `os/Raspbian/release_notes.txt` in the `NOOBS-*
 
 **VERIFY THAT YOU KNOW WHAT YOU'RE DOING BEFORE RUNNING COMMANDS GIVEN BELOW. THESE CAN DESTROY YOUR SYSTEM, NOT ONLY THE CARD!**
 
-In Windows, run `cmd.exe` as Administrator, then `diskpart`: 
+In Windows, run `cmd.exe` as Administrator, then `diskpart`:
 
 ```
 list disk
@@ -30,8 +30,14 @@ or clone it
 ```
 cd
 git clone https://github.com/ziembla/raspi-fun.git
-git config --global user.name XXXXX
-git config --global user.email XXXXX
+cd raspi-fun
+git config --local user.name XXXXX
+git config --local user.email XXXXX
+```
+
+checking git settings
+```
+for option in '--system' '--global' '--local' '' ; do echo ========== $option ; git config -l $option ; done
 ```
 
 ## Basic configuration
@@ -90,11 +96,19 @@ verify, that the `pi` user has `!` in front of the password hash to be locked fr
 
     * unlock later with `usermod -U pi` when needed
     * remember, that `su pi` from `root`'s terminal is still possible (no password needed)
-
-* append the following to `.bashrc` files in both `/home/XXXXX` and `/root` directories 
+* append the following to `/etc/environment`
+~~~
+export EDITOR=vi
+~~~
+* append the following to `~/.bash_profile`
+~~~
+export HISTCONTROL=ignorespace:ignoredups:erasedups
+shopt -s histappend
+export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}history -a; history -c; history -r"
+~~~
+* append the following to `~/.bashrc` and `/root/.bashrc`
 ~~~
 alias ll='ls -l'
-export EDITOR=vi
 ~~~
 * in terminal (optionally, for "NOPASSWD" sudo for new user)
 ~~~
@@ -108,14 +122,17 @@ XXXXX ALL=(ALL) NOPASSWD: ALL
 
 * to change font in terminal window (LXTerminal) just use "Edycja"/"Preferencje" to change "Monospace 10"->"DejaVu Sans Mono 9"
 
+### other settings
 
-### clone this doc
+monospace font: Droid Sans Mono (ew. DejaVu Sans Mono), size 9
 
-```
-cd
-git clone https://github.com/ziembla/raspi-fun.git
-```
 
+* geany
+    - set monospaced font for output
+* retext
+    - set `Roboto 10` as default rendering font
+    - `printf '\n[General]\neditorFont=Droid Sans Mono\neditorFontSize=9\n' >> ~/.config/ReText\ project/ReText.conf`
+    - use `^l` for live preview
 
 ### wifi
 
@@ -152,6 +169,8 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install \
     kate \
+    retext \
+    geany \
     vlc \
     okular \
     iceweasel \
@@ -161,6 +180,33 @@ sudo apt-get install \
     colobot \
  
 ```
+
+* scala
+```
+sudo su -
+
+v=2.11.8
+cd /tmp
+wget http://downloads.lightbend.com/scala/$v/scala-$v.tgz
+cd /opt
+tar zxvf /tmp/scala-$v.tgz
+mv scala-$v scala
+printf 'export PATH=$PATH:/opt/scala/bin\n' > /etc/profile.d/scala.sh
+```
+
+* maven
+```
+sudo su -
+
+v=3.3.9
+cd /tmp
+wget ftp://ftp.task.gda.pl/pub/www/apache/dist/maven/maven-3/$v/binaries/apache-maven-$v-bin.tar.gz
+cd /opt
+tar zxvf /tmp/apache-maven-$v-bin.tar.gz
+mv apache-maven-$v apache-maven
+printf 'export M2_HOME=/opt/apache-maven\nexport PATH=$PATH:$M2_HOME/bin\n' > /etc/profile.d/maven.sh
+```
+
 
 Warnings
 - **colobot** is a superb programming game "for children", still at least the linux '0.1.3-alpha' version tends to hang my raspberry 2 (NOOBS+Raspbian 1.9.0). I have no idea whether it is the game's or experimental OpenGL's (see `raspi-config` above) fault...
@@ -253,8 +299,14 @@ ssh USER@HOST
 
 ### packages
 
+* list files coming with PACKAGE
 ```
-dpkg-query -L <package> # list files coming with <package>
+dpkg-query -L PACKAGE
+```
+* find package that brought FILE (Note: for `java` there is a sequence of links with /etc/alternalives etc.)
+```
+dpkg-query -S FILE
+dpkg-query -S $(readlink -e $(which java))
 ```
 
 ### finding
