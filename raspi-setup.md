@@ -66,7 +66,7 @@ sudo raspi-config
         * "Memory Split" 256
         * (leave SSH access enabled?!)
         * "Audio"/"Force 3.5mm jack"
-        * "GL Driver"/"Enable" (required by colobot only?!)
+        * "GL Driver"/"???" ("Disabled" by default and good for minecraft, "Enabled" needed for colobot)
     * "Finish" (**Tab** to exit menu)
     * reboot
 * in terminal
@@ -155,18 +155,15 @@ sudo apt-get install \
     vlc \
     okular \
     iceweasel \
-
+    git-cola gitk \
     python-nltk \
-
     python-reportlab \
-
     colobot \
-
  
 ```
 
 Warnings
-- **colobot** is a superb programming game, still at least the linux '0.1.3-alpha' version tends to hang my raspberry 2 (NOOBS+Raspbian 1.9.0). I have no idea whether it is the game's or experimental OpenGL's (see `raspi-config` above) fault...
+- **colobot** is a superb programming game "for children", still at least the linux '0.1.3-alpha' version tends to hang my raspberry 2 (NOOBS+Raspbian 1.9.0). I have no idea whether it is the game's or experimental OpenGL's (see `raspi-config` above) fault...
 - don't try to install "all" in `sudo python -c "import nltk; nltk.download()"` (too big)
 
 
@@ -225,6 +222,10 @@ g++ --version
 * mathematica
 ~~~
 wolfram -run 'Print[$Version]; Quit[]'
+~~~
+* python
+~~~
+python -c "import sys; print sys.version #sys.version_info"
 ~~~
 * firmware
 ~~~
