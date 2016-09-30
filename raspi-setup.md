@@ -1,15 +1,19 @@
-
+﻿
 # Setting up a new Raspberry Pi #
 
-## Installing NOOBS
+## Installing NOOBS ##
 
 Note: Raspbian's changelog is in `os/Raspbian/release_notes.txt` in the `NOOBS-*.zip`
 
-### cleaning flash card
+### Cleaning flash card ###
 
 **VERIFY THAT YOU KNOW WHAT YOU'RE DOING BEFORE RUNNING COMMANDS GIVEN BELOW. THESE CAN DESTROY YOUR SYSTEM, NOT ONLY THE CARD!**
 
-In Windows, run `cmd.exe` as Administrator, then `diskpart`:
+After preparing the card put contents of the unzipped NOOBS archive on it.
+
+#### Windows ####
+
+Run `cmd.exe` as Administrator, then `diskpart`:
 
 ```
 list disk
@@ -20,13 +24,33 @@ format fs=fat32 quick
 assign
 ```
 
-Put contents of the unzipped NOOBS archive on the card.
+#### Linux #####
 
-### view this doc
+Identify the device for your card with:
+```
+sudo parted --list
+```
+Unmount any of the partitions if auto-mounted by OS on card insert event!
+
+Check the end of the usable space and proceed with cleaning:
+```
+DEVICE=/dev/sdXXX
+
+sudo parted ${DEVICE} unit B print free
+
+CARD_END=XXX
+CARD_LABEL=raspi
+
+sudo dd if=/dev/zero of=${DEVICE} bs=10M count=2
+sudo parted ${DEVICE} mklabel msdos unit b mkpart pri fat32 1048576 ${CARD_END}  
+sudo mkfs.vfat -F 32 -n ${CARD_LABEL} ${DEVICE}1
+```
+
+### Getting this doc ###
 
 <https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md>
 
-or clone it
+Clone the doc?
 ```
 cd
 git clone https://github.com/ziembla/raspi-fun.git
@@ -35,7 +59,7 @@ git config --local user.name XXXXX
 git config --local user.email XXXXX
 ```
 
-checking git settings
+Checking git settings
 ```
 for option in '--system' '--global' '--local' '' ; do echo ========== $option ; git config -l $option ; done
 ```
@@ -121,6 +145,31 @@ XXXXX ALL=(ALL) NOPASSWD: ALL
 ~~~
 
 * to change font in terminal window (LXTerminal) just use "Edycja"/"Preferencje" to change "Monospace 10"->"DejaVu Sans Mono 9"
+
+
+
+
+
+## Updating
+
+~~~
+
+~~~
+
+
+### Checking software versions
+
+
+
+
+
+
+
+
+
+
+---
+
 
 ### other settings
 
