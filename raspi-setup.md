@@ -140,12 +140,7 @@ alias ll="ls -l"
 alias mc=". /usr/lib/mc/mc-wrapper.sh"
 
 EOF
-echo "$SETTINGS"
-
-
-FILES="~/.bashrc /root/.bashrc /etc/skel/.bashrc"
-
-FILES="$FILES /home/ryjek/.bashrc"
+FILES="/home/`id -un`/.bashrc /root/.bashrc /etc/skel/.bashrc"
 
 echo "$SETTINGS" | sudo tee -a $FILES > /dev/null
 ```
@@ -199,6 +194,9 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 ```
 
+`sudo rpi-update` not needed...?
+
+
 Checking free space available might be useful before
 
 ```
@@ -220,6 +218,7 @@ package         | command
 linux distro    |lsb_release -a
 linux kernel    |uname -a
 raspi firmware  |vcgencmd version
+raspi board     |cat /sys/firmware/devicetree/base/model
 mathematica     |wolfram -run 'Print[$Version]; Quit[]'
 g++             |g++ --version
 python          |python -c "import sys; print sys.version #sys.version_info"
@@ -463,6 +462,7 @@ find ~ -type f -regex '.*pattern.*' -mtime -1 -ls
 dmesg -H
 htop
 
+free -oh
 
 pgrep PROCESS_NAME
 pgrep -l PROCESS_NAME
