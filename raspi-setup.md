@@ -39,7 +39,7 @@ DEVICE=/dev/sdXXX
 sudo parted ${DEVICE} unit B print free
 
 CARD_END=XXX
-CARD_LABEL=raspi
+CARD_LABEL=RASPI
 
 sudo dd if=/dev/zero of=${DEVICE} bs=10M count=2
 sudo parted ${DEVICE} mklabel msdos unit b mkpart pri fat32 1048576 ${CARD_END}  
@@ -90,7 +90,7 @@ sudo raspi-config
             * clean existing "en_GB.UTF-8" or "en_US..." using **Space**
             * check "pl_PL.UTF-8"
         * "Change timezone"/"Europe"/"Warsaw"
-        * "Change keyboard layout"/"104-key"/"Polish"/"default"/"no compose"/"no"
+        * "Change keyboard layout"/"104-key"/"Polish"/"default"/"no compose"/"yes"
     * "Advanced options"
         * "Hostname" (raspberrypi->XXXXX)
         * "Memory Split" 256
@@ -160,8 +160,7 @@ XXXXX ALL=(ALL) NOPASSWD: ALL
 ### Checking software versions
 
 
-
-
+(raspi firmware versions look cryptic but they're just git commit ids, see <https://github.com/raspberrypi/firmware/commits/master>
 
 
 
