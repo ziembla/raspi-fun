@@ -1,4 +1,4 @@
-﻿
+
 # Setting up a new Raspberry Pi #
 
 ## Installing NOOBS ##
@@ -124,21 +124,33 @@ sudo dpkg-reconfigure console-setup
 
 ```
 read -d '' SETTINGS << EOF
-    export EDITOR="vi -e"
-    export VISUAL=vi
 
-    export HISTCONTROL=ignorespace:ignoredups:erasedups
-    shopt -s histappend
-    export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}history -a; history -c; history -r"
+EDITOR="vi -e"
+VISUAL=vi
 
-    alias ll='ls -l'
+HISTCONTROL=ignoreboth:erasedups
+shopt -s histappend
+shopt -s histverify
+HISTSIZE=5000
+HISTFILESIZE=8000
+ #PROMPT_COMMAND="history -a; history -c; history -r"
+PROMPT_COMMAND="history -w"
+
+alias ll="ls -l"
+alias mc=". /usr/lib/mc/mc-wrapper.sh"
+
 EOF
+echo "$SETTINGS"
+
+
 FILES="~/.bashrc /root/.bashrc /etc/skel/.bashrc"
 
 FILES="$FILES /home/ryjek/.bashrc"
 
 echo "$SETTINGS" | sudo tee -a $FILES > /dev/null
 ```
+
+Note, that `echo $SETTINGS` would glued all lines into one, quotations needed to keep the original form!
 
 ### nonstandard user setup
 
@@ -182,10 +194,10 @@ XXXXX ALL=(ALL) NOPASSWD: ALL
 
 ## Updating
 
-~~~
+```
 sudo apt-get update
 sudo apt-get dist-upgrade
-~~~
+```
 
 Checking free space available might be useful before
 
@@ -197,29 +209,26 @@ du -hd1 /tmp
 
 Downloaded packages can be deleted from `/var/cache/apt/archives` with `sudo apt-get clean`.
 
-`sudo apt-get autoremove`.
+Unneeded orphaned packages can be deleted with `sudo apt-get autoremove`.
+
+## Installing additional software ##
 
 ### Checking software versions
 
-#### linux distro ####
-```
-lsb_release -a
-```
+package         | command
+---             | ---
+linux distro    |lsb_release -a
+linux kernel    |uname -a
+raspi firmware  |vcgencmd version
+mathematica     |wolfram -run 'Print[$Version]; Quit[]'
+g++             |g++ --version
+python          |python -c "import sys; print sys.version #sys.version_info"
 
-#### linux kernel ####
-```
-uname -a
-```
-#### raspberry pi firmware ####
-```
-vcgencmd version
-```
 (raspi firmware versions look cryptic but they're just git commit ids, see <https://github.com/raspberrypi/firmware/commits/master>
 
 NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! 
 
-
-## Installing additional software ##
+### Installing
 
 ```
 PACKAGES=
@@ -237,10 +246,10 @@ PACKAGES="$PACKAGES tidy"
 PACKAGES="$PACKAGES mc screen lsof"
 PACKAGES="$PACKAGES freeplane"
 
-#PACKAGES="$PACKAGES emacs24 org-mode emacs-goodies-el"
-#PACKAGES="$PACKAGES openjdk-8-jdk"
-#PACKAGES="$PACKAGES vlc"
-#PACKAGES="$PACKAGES meld"
+ #PACKAGES="$PACKAGES emacs24 org-mode emacs-goodies-el"
+ #PACKAGES="$PACKAGES openjdk-8-jdk"
+ #PACKAGES="$PACKAGES vlc"
+ #PACKAGES="$PACKAGES meld"
 
 PACKAGES=
 sudo apt-get install $PACKAGES
@@ -409,34 +418,13 @@ usermod -L pi
 usermod -U pi
 ```
 
-### version checks
-
-* linux kernel
-~~~
-uname -a
-~~~
-* g++
-~~~
-g++ --version
-~~~
-* mathematica
-~~~
-wolfram -run 'Print[$Version]; Quit[]'
-~~~
-* python
-~~~
-python -c "import sys; print sys.version #sys.version_info"
-~~~
-* firmware
-~~~
-/opt/vc/bin/vcgencmd version
-~~~
 
 ### screenshots
-~~~
+```
 scrot -cd 5 -a PLIK.png
 scrot -s
-~~~
+```
+
 `-d` delay (`-c` countwdown)  
 `-u` active window  
 `-s` selected area
