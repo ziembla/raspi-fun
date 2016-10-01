@@ -484,3 +484,7 @@ hexdump -Cn 512 XXXXX
 ```
 
 - after X-window hang: keep `<Alt>+<PrtScr>` pressed and type (slowly, wait for any response after each key): `reisub`
+
+
+
+(just a test)
