@@ -27,12 +27,15 @@ assign
 #### Linux #####
 
 Identify the device for your card with:
+
 ```
 sudo parted --list
 ```
+
 Unmount any of the partitions if auto-mounted by OS on card insert event!
 
 Check the end of the usable space and proceed with cleaning:
+
 ```
 DEVICE=/dev/sdXXX
 
@@ -51,6 +54,7 @@ sudo mkfs.vfat -F 32 -n ${CARD_LABEL} ${DEVICE}1
 <https://github.com/ziembla/raspi-fun/blob/master/raspi-setup.md>
 
 Clone the doc?
+
 ```
 cd
 git clone https://github.com/ziembla/raspi-fun.git
@@ -59,7 +63,14 @@ git config --local user.name XXXXX
 git config --local user.email XXXXX
 ```
 
+If from bare repo on USB use something like:
+
+```
+git clone /media/pi/PASPI_GIT/git-repos/raspi-fun
+```
+
 Checking git settings
+
 ```
 for option in '--system' '--global' '--local' '' ; do echo ========== $option ; git config -l $option ; done
 ```
@@ -73,16 +84,20 @@ for option in '--system' '--global' '--local' '' ; do echo ========== $option ; 
 tvservice -d /tmp/edid-dump
 edidparser /tmp/edid-dump
 ~~~
+
 Find the best mode, for FullHD there should be "DMT mode (82) 1920x1080p" listed
+
 * reboot, go to NOOBS console
 * "Edit config"
     * remove/comment any "overscan_" lines
     * set `hdmi_group=2` and `hdmi_mode=82` (as checked above, group 2 is for DMT)
     * "Exit" to reboot
 * in terminal
+
 ~~~
 sudo raspi-config
 ~~~
+
     * "Change user password"
     * "Boot options"/"Console"
     * "Internationalisation Options"
@@ -105,44 +120,59 @@ sudo dpkg-reconfigure console-setup
 ~~~
     * "UTF-8"/"Latin2"/"Terminus" (or "Fixed")/"8x16" (or "8x14")
 
+### some global setup
+
+```
+read -d '' SETTINGS << EOF
+    export EDITOR="vi -e"
+    export VISUAL=vi
+
+    export HISTCONTROL=ignorespace:ignoredups:erasedups
+    shopt -s histappend
+    export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}history -a; history -c; history -r"
+
+    alias ll='ls -l'
+EOF
+FILES="~/.bashrc /root/.bashrc /etc/skel/.bashrc"
+
+FILES="$FILES /home/ryjek/.bashrc"
+
+echo "$SETTINGS" | sudo tee -a $FILES > /dev/null
+```
+
 ### nonstandard user setup
 
-* in terminal
-~~~
-sudo su -
-adduser XXXXX --gecos ''
-usermod -G `groups pi | awk '{ s = substr($0,2*length("pi")+5); gsub(/ /,",",s); print s}'` XXXXX
-cat /etc/shadow | grep pi
-usermod -L pi
-cat grep pi /etc/shadow 
-~~~
-verify, that the `pi` user has `!` in front of the password hash to be locked from logging in  
+Create a new user, assign to the `pi`'s groups an disable `pi`
+
+Verify, that the `pi` user has `!` in front of the password hash to unable logging in  
 
     * unlock later with `usermod -U pi` when needed
-    * remember, that `su pi` from `root`'s terminal is still possible (no password needed)
-* append the following to `/etc/environment`
+    * note, that `su pi` from `root`'s terminal is still possible (no password needed!)
+
+Note, that you need `sudo` without password prompt for your user, as some default applications assume that (running Scratch from a menu can hang your X-window session with the invisible sudo password prompt... learnt the hard way)
+
 ~~~
-export EDITOR=vi
+
+NEW_USER=XXXXX
+
+sudo adduser ${NEW_USER} --gecos ''
+
+sudo usermod -aG `groups pi | awk '{ s = substr($0,2*length("pi")+5); gsub(/ /,",",s); print s}'` ${NEW_USER}
+
+grep pi /etc/shadow
+sudo usermod -L pi
+grep pi /etc/shadow
+
+sudo visudo
 ~~~
-* append the following to `~/.bash_profile`
-~~~
-export HISTCONTROL=ignorespace:ignoredups:erasedups
-shopt -s histappend
-export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}history -a; history -c; history -r"
-~~~
-* append the following to `~/.bashrc` and `/root/.bashrc`
-~~~
-alias ll='ls -l'
-~~~
-* in terminal (optionally, for "NOPASSWD" sudo for new user)
-~~~
-sudo su -
-visudo
-~~~
-add line based of the `pi` user
+
+add line based of the `pi` user (or just add your username after comma `pi,XXXXX`)
+
 ~~~
 XXXXX ALL=(ALL) NOPASSWD: ALL
 ~~~
+
+
 
 * to change font in terminal window (LXTerminal) just use "Edycja"/"Preferencje" to change "Monospace 10"->"DejaVu Sans Mono 9"
 
@@ -153,19 +183,95 @@ XXXXX ALL=(ALL) NOPASSWD: ALL
 ## Updating
 
 ~~~
-
+sudo apt-get update
+sudo apt-get dist-upgrade
 ~~~
 
+Checking free space available might be useful before
+
+```
+df -h
+du -sh /var/cache/apt/archives
+du -hd1 /tmp
+```
+
+Downloaded packages can be deleted from `/var/cache/apt/archives` with `sudo apt-get clean`.
+
+`sudo apt-get autoremove`.
 
 ### Checking software versions
 
+#### linux distro ####
+```
+lsb_release -a
+```
 
+#### linux kernel ####
+```
+uname -a
+```
+#### raspberry pi firmware ####
+```
+vcgencmd version
+```
 (raspi firmware versions look cryptic but they're just git commit ids, see <https://github.com/raspberrypi/firmware/commits/master>
 
+NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! NOT TRUE !!! 
 
 
+## Installing additional software ##
+
+```
+PACKAGES=
+PACKAGES="$PACKAGES htop tree"
+PACKAGES="$PACKAGES git-cola gitk"
+PACKAGES="$PACKAGES kdiff3"
+PACKAGES="$PACKAGES retext markdown"
+PACKAGES="$PACKAGES dolphin"
+PACKAGES="$PACKAGES kate"
+PACKAGES="$PACKAGES pinta"
+PACKAGES="$PACKAGES anki"
+PACKAGES="$PACKAGES graphviz"
+PACKAGES="$PACKAGES imagemagick"
+PACKAGES="$PACKAGES tidy"
+PACKAGES="$PACKAGES mc screen lsof"
+PACKAGES="$PACKAGES freeplane"
+
+#PACKAGES="$PACKAGES emacs24 org-mode emacs-goodies-el"
+#PACKAGES="$PACKAGES openjdk-8-jdk"
+#PACKAGES="$PACKAGES vlc"
+#PACKAGES="$PACKAGES meld"
+
+PACKAGES=
+sudo apt-get install $PACKAGES
+
+```
+
+### (ubuntu-only packages, not for raspi) ###
+
+```
+PACKAGES="$PACKAGES indicator-multiload"
+PACKAGES="$PACKAGES meld"
+
+```
+
+### Searching for packages ###
+
+Non-installed
+
+```
+apt-cache search --names-only emacs
+apt-cache search --names-only openjdk
+apt-cache show emacs24
 
 
+```
+
+Installed
+```
+dpkg -l
+dpkg -l '*-dev'
+```
 
 ---
 
@@ -368,6 +474,11 @@ find ~ -type f -regex '.*pattern.*' -mtime -1 -ls
 ~~~
 dmesg -H
 htop
+
+
+pgrep PROCESS_NAME
+pgrep -l PROCESS_NAME
+
 ~~~
 
 ~~~
