@@ -19,8 +19,8 @@ Run `cmd.exe` as Administrator, then `diskpart`:
 list disk
 select disk XXX
 clean
-create partition primary
-format fs=fat32 quick
+create partition primary offset=4096
+format fs=fat32 quick label=ABC
 assign
 ```
 
